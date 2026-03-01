@@ -107,9 +107,9 @@ python app.py
 
 ---
 
-For Admin Login:-
-ID:- admin
-Pass:- Admin@1234
+* For Admin Login:-
+* ID:- admin
+* Pass:- Admin@1234
 
 * *Dont forget to do signup for both teacher and professor before doing login*
 * *The Admin only add data which is useful in student dashboard, login data is purely diffrent for student*
