@@ -111,10 +111,10 @@ For Admin Login:-
 ID:- admin
 Pass:- Admin@1234
 
-*Dont forget to do signup for both teacher and professor before doing login*
-*The Admin only add data which is useful in student dashboard, login data is purely diffrent for student*
+* *Dont forget to do signup for both teacher and professor before doing login*
+* *The Admin only add data which is useful in student dashboard, login data is purely diffrent for student*
 
-Login data blueprint is *user.py*
-Student data blueprint is *student_data.py*
+* Login data blueprint is *user.py*
+* Student data blueprint is *student_data.py*
 ---
 
