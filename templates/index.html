@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>College Managment</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', sans-serif;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #f4f6f9;
+      /* Clean minimalistic background */
+      color: #1a1a1a;
+      /* Dark text for minimalism */
+      margin: 0;
+    }
+
+    /* Minimalist card */
+    .login-container {
+      background: #ffffff;
+      border: 1px solid #e1e4e8;
+      border-radius: 16px;
+      padding: 40px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: 600;
+      font-size: 24px;
+      letter-spacing: -0.5px;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Role Switcher */
+    .role-switcher {
+      display: flex;
+      background: #f0f2f5;
+      border-radius: 30px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .role-btn {
+      flex: 1;
+      padding: 12px 0;
+      text-align: center;
+      color: #666;
+      cursor: pointer;
+      z-index: 1;
+      font-weight: 500;
+      font-size: 14px;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+
+    .role-btn.active {
+      color: #fff;
+    }
+
+    .indicator {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 33.333%;
+      background-color: #1a1a1a;
+      /* Default color */
+      border-radius: 30px;
+      /* The requested bouncy animation: */
+      transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55), background-color 0.4s ease;
+      z-index: 0;
+    }
+
+    /* Inputs */
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #f9fafb;
+      border: 1px solid #e1e4e8;
+      border-radius: 10px;
+      color: #1a1a1a;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-group input::placeholder {
+      color: #9ca3af;
+    }
+
+    .input-group input:focus {
+      background: #ffffff;
+      border-color: var(--focus-color, #1a1a1a);
+      box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.05);
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background-color: #1a1a1a;
+      color: white;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 10px;
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      opacity: 0.9;
+    }
+
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+
+    .forgot-password {
+      text-align: center;
+      margin-top: 25px;
+      font-size: 13px;
+    }
+
+    .forgot-password a {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s ease;
+    }
+
+    .forgot-password a:hover {
+      color: #1a1a1a;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="login-container">
+    <h2 id="login-title">User Login</h2>
+
+    <div class="role-switcher">
+      <div class="indicator" id="role-indicator"></div>
+      <div class="role-btn active" onclick="switchRole('user', 0)">User</div>
+      <div class="role-btn" onclick="switchRole('professor', 1)">Professor</div>
+      <div class="role-btn" onclick="switchRole('admin', 2)">Admin</div>
+    </div>
+
+    <form id="login-form" action="/" method="POST">
+      <input type="hidden" name="role" id="role-input" value="user">
+
+      <div class="input-group">
+        <input type="text" id="id-input" name="ID" placeholder="Student ID" autocomplete="off">
+      </div>
+
+      <div class="input-group">
+        <input type="password" name="password" placeholder="Password">
+      </div>
+
+      <button type="submit" class="submit-btn" id="submit-btn">Login as User</button>
+    </form>
+
+    {% if message %}
+    <p style="text-align:center; margin-top:15px; color:red; font-size:14px;">{{ message }}</p>
+    {% endif %}
+
+    <div class="forgot-password">
+      <a href="#">Forgot your password?</a>
+    </div>
+
+    <div class="forgot-password" style="margin-top: 12px;">
+      Don't have an account? <a href="/signup" style="color: #0066ff; font-weight: 500;">Sign Up</a>
+    </div>
+  </div>
+
+  <script>
+    const indicator = document.getElementById('role-indicator');
+    const loginTitle = document.getElementById('login-title');
+    const submitBtn = document.getElementById('submit-btn');
+    const roleInput = document.getElementById('role-input');
+    const roleBtns = document.querySelectorAll('.role-btn');
+    const loginForm = document.getElementById('login-form');
+
+    // Solid, minimal colors for the themes
+    const themes = {
+      user: {
+        title: 'User Login',
+        btnText: 'Login as User',
+        color: '#1a1a1a',
+        action: '/',
+        idPlaceholder: 'Student ID'
+      },
+      professor: {
+        title: 'Professor Login',
+        btnText: 'Login as Professor',
+        color: '#0066ff',
+        action: '/',
+        idPlaceholder: 'Teacher ID'
+      },
+      admin: {
+        title: 'Admin Login',
+        btnText: 'Login as Admin',
+        color: '#dc2626',
+        action: '/',
+        idPlaceholder: 'Admin ID'
+      }
+    };
+
+    function switchRole(role, index) {
+      // 1) Update active tab styling
+      roleBtns.forEach(btn => btn.classList.remove('active'));
+      roleBtns[index].classList.add('active');
+
+      // 2) Move bouncy indicator
+      indicator.style.transform = `translateX(${index * 100}%)`;
+
+      // 3) Apply clean flat colors and text smoothly
+      const theme = themes[role];
+
+      // Fade out text to swap smoothly
+      loginTitle.style.opacity = 0;
+      submitBtn.style.opacity = 0;
+
+      setTimeout(() => {
+        // Change Colors Visually
+        indicator.style.backgroundColor = theme.color;
+        submitBtn.style.backgroundColor = theme.color;
+
+        // Update root variable so focus ring matches the active role color
+        document.documentElement.style.setProperty('--focus-color', theme.color);
+
+        // Change Text
+        loginTitle.textContent = theme.title;
+        submitBtn.textContent = theme.btnText;
+        document.getElementById('id-input').placeholder = theme.idPlaceholder;
+
+        // Form Routing config (keeps GET right now)
+        roleInput.value = role;
+        loginForm.action = theme.action;
+
+        // Fade in text
+        loginTitle.style.opacity = 1;
+        submitBtn.style.opacity = 1;
+      }, 200);
+    }
+  </script>
+</body>
+
+</html>

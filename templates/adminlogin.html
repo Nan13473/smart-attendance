@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel – SmartPortal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #1a1a1a;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #ffffff;
+            border-right: 1px solid #e1e4e8;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .nav-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            color: #666;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            display: block;
+        }
+
+        .nav-item:hover {
+            background: #f0f2f5;
+            color: #1a1a1a;
+        }
+
+        .nav-item.active {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .logout-btn {
+            margin-top: auto;
+            color: #dc2626;
+        }
+
+        .logout-btn:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        /* Main */
+        .main-content {
+            flex: 1;
+            padding: 40px 50px;
+            overflow-y: auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        header h1 {
+            font-size: 26px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .badge {
+            background: #fee2e2;
+            color: #dc2626;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        /* Form Card */
+        .card {
+            background: #ffffff;
+            border: 1px solid #e1e4e8;
+            border-radius: 14px;
+            padding: 35px;
+            max-width: 520px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: #1a1a1a;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 6px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #1a1a1a;
+            background-color: #f9fafb;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+            appearance: none;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: #dc2626;
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.07);
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background-color: #dc2626;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-submit:hover {
+            background-color: #b91c1c;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.99);
+        }
+
+        /* Flash message */
+        .flash {
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .flash.success {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .flash.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <h2>Admin Panel</h2>
+        <a href="/admin" class="nav-item active">Add Student Data</a>
+        <a href="#" class="nav-item">View Students</a>
+        <a href="#" class="nav-item">Manage Teachers</a>
+        <a href="/" class="nav-item logout-btn">Logout</a>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header>
+            <h1>Add Student</h1>
+            <span class="badge">ADMIN</span>
+        </header>
+
+        <!-- Flash messages from Flask -->
+        {% if message %}
+        <div class="flash {% if message == 'Data submitted' %}success{% else %}error{% endif %}">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <!-- Form — field names match exactly what app.py reads -->
+        <div class="card">
+            <h3>Student Details</h3>
+            <form action="/admin" method="POST">
+
+                <div class="form-group">
+                    <label for="name">Student Full Name</label>
+                    <input type="text" id="name" name="name" placeholder="e.g. Rahul Sharma" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="roll_no">Student Roll Number / ID</label>
+                    <input type="text" id="roll_no" name="roll_no" placeholder="e.g. S001" required>
+                </div>
+
+                <div class="two-col">
+                    <div class="form-group">
+                        <label for="branch">Branch</label>
+                        <!-- app.py reads: request.form['branch'] -->
+                        <select id="branch" name="branch" required>
+                            <option value="" disabled selected>Select branch</option>
+                            <option value="CS">Computer Science</option>
+                            <option value="IT">Information Technology</option>
+                            <option value="ECE">Electronics</option>
+                            <option value="ME">Mechanical</option>
+                            <option value="CIVIL">Civil</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="born">Date of Birth</label>
+                        <!-- app.py reads: request.form['born'] -->
+                        <input type="date" id="born" name="born" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Submit Student Data</button>
+            </form>
+        </div>
+    </main>
+
+</body>
+
+</html>
