@@ -102,6 +102,11 @@ pip install flask flask_sqlalchemy
 python app.py
 
 ```
+
+4. **Access the portal:** Open your browser and navigate to `http://0.0.0.0:3000`.
+
+---
+
 For Admin Login:-
 ID:- admin
 Pass:- Admin@1234
@@ -111,8 +116,5 @@ Pass:- Admin@1234
 
 Login data blueprint is *user.py*
 Student data blueprint is *student_data.py*
-4. **Access the portal:** Open your browser and navigate to `http://0.0.0.0:3000`.
-
 ---
-
 
