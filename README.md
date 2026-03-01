@@ -103,7 +103,7 @@ python app.py
 
 ```
 
-4. **Access the portal:** Open your browser and navigate to `http://0.0.0.0:3000`.
+4. **Access the portal:** Click *Ctrl+Enter* or copy the address from terminal and paste it in browser.
 
 ---
 
