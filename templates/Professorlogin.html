@@ -781,96 +781,104 @@
         <div id="section-editAttendance" class="page-section">
             <div class="section-panel">
                 <h2>Mark / Edit Attendance</h2>
-                <div class="filter-row">
-                    <select id="attSubject" onchange="loadAttendanceStudents()">
-                        <option value="" disabled selected>Select Subject</option>
-                        <option value="dsa-a">DSA — CS-A</option>
-                        <option value="dsa-b">DSA — CS-B</option>
-                        <option value="oop-a">OOP — CS-A</option>
-                        <option value="oop-it">OOP — IT-A</option>
-                    </select>
-                    <input type="date" id="attDate" value="2026-02-25">
-                    <button class="btn btn-dark" onclick="loadAttendanceStudents()">Load</button>
-                </div>
+                <form method="POST" action="/professor">
+                    <input type="hidden" name="action" value="Load">
+                    <div class="filter-row">
+                        <input type="date" id="attDate" name="date" required>
+                        <select name="branch" id="attBranch" required>
+                            <option value="" disabled selected>Select Branch</option>
+                            <option value="CS">CS</option>
+                            <option value="IT">IT</option>
+                            <option value="ECE">ECE</option>
+                            <option value="ME">ME</option>
+                            <option value="Unknown">Unknown</option>
+                        </select>
+                        <button type="submit" class="btn btn-dark">Load</button>
+                    </div>
+                </form>
 
-                <div id="attendanceEditor" style="display:none;">
-                    <div class="filter-row" style="justify-content: space-between;">
-                        <div style="display:flex; gap:10px;">
-                            <button class="btn btn-sm btn-outline" onclick="markAll('P')">Mark All Present</button>
-                            <button class="btn btn-sm btn-outline" onclick="markAll('A')">Mark All Absent</button>
+                {% if filter %}
+                <div style="margin-top: 20px;">
+                    <div class="filter-row" style="justify-content: space-between; margin-bottom: 10px;">
+                        <h3 style="font-size:15px; color:#555;">
+                            Results for <strong>{{ filter[0].branch }}</strong> on <strong>{{ filter[0].date }}</strong>
+                            — {{ filter|length }} record(s)
+                        </h3>
+                        <div class="summary-row" style="margin: 0;">
+                            <span class="summary-chip present">
+                                ✅ Present: {{ filter | selectattr('status', 'equalto', true) | list | length }}
+                            </span>
+                            <span class="summary-chip absent">
+                                ❌ Absent: {{ filter | selectattr('status', 'equalto', false) | list | length }}
+                            </span>
+                            <span class="summary-chip total">
+                                Total: {{ filter|length }}
+                            </span>
                         </div>
-                        <div id="attendanceSummaryBadges" class="summary-row" style="margin:0;"></div>
                     </div>
 
-                    <div class="attendance-grid" id="attendanceGrid">
-                        <div class="att-header" style="justify-content:center;">#</div>
-                        <div class="att-header">Student Name</div>
-                        <div class="att-header">Status</div>
-                    </div>
-
-                    <div style="margin-top: 20px; display: flex; gap: 12px;">
-                        <button class="btn btn-success" onclick="saveAttendance()">💾 Save Attendance</button>
-                        <button class="btn btn-outline" onclick="resetAttendance()">↩ Reset</button>
-                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Roll No</th>
+                                <th>Student Name</th>
+                                <th>Subject</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in filter %}
+                            <tr id="row-{{ record.id }}">
+                                <td>{{ loop.index }}</td>
+                                <td>{{ record.roll_no }}</td>
+                                <td>{{ record.student_name }}</td>
+                                <td>{{ record.subject }}</td>
+                                <td>
+                                    {% if record.status %}
+                                    <span class="badge badge-green">Present</span>
+                                    {% else %}
+                                    <span class="badge badge-red">Absent</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <button class="btn btn-sm btn-outline"
+                                        onclick="toggleEditRow({{ record.id }})">Edit</button>
+                                    <div id="edit-{{ record.id }}" class="att-toggle"
+                                        style="display:none; margin-top:6px; flex-direction:row; gap:6px;">
+                                        <form method="POST" action="/professor" style="display:inline;">
+                                            <input type="hidden" name="action" value="edit">
+                                            <input type="hidden" name="roll" value="{{ record.roll_no }}">
+                                            <input type="hidden" name="attend" value="Present">
+                                            <input type="hidden" name="date" value="{{ filter[0].date }}">
+                                            <input type="hidden" name="branch" value="{{ filter[0].branch }}">
+                                            <button type="submit"
+                                                class="att-btn p {% if record.status %}selected{% endif %}">
+                                                ✔ Present
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="/professor" style="display:inline;">
+                                            <input type="hidden" name="action" value="edit">
+                                            <input type="hidden" name="roll" value="{{ record.roll_no }}">
+                                            <input type="hidden" name="attend" value="Absent">
+                                            <input type="hidden" name="date" value="{{ filter[0].date }}">
+                                            <input type="hidden" name="branch" value="{{ filter[0].branch }}">
+                                            <button type="submit"
+                                                class="att-btn a {% if not record.status %}selected{% endif %}">
+                                                ✘ Absent
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <!-- Recent Attendance History -->
-            <div class="section-panel">
-                <h2>Recent Attendance Records</h2>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Subject</th>
-                            <th>Section</th>
-                            <th>Present</th>
-                            <th>Absent</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Feb 25, 2026</td>
-                            <td>DSA</td>
-                            <td><span class="badge badge-blue">CS-A</span></td>
-                            <td><span style="color:#16a34a; font-weight:600;">38</span></td>
-                            <td><span style="color:#dc2626; font-weight:600;">4</span></td>
-                            <td><button class="btn btn-sm btn-outline"
-                                    onclick="showToast('Editing attendance for Feb 25...')">Edit</button></td>
-                        </tr>
-                        <tr>
-                            <td>Feb 24, 2026</td>
-                            <td>OOP</td>
-                            <td><span class="badge badge-green">CS-A</span></td>
-                            <td><span style="color:#16a34a; font-weight:600;">35</span></td>
-                            <td><span style="color:#dc2626; font-weight:600;">5</span></td>
-                            <td><button class="btn btn-sm btn-outline"
-                                    onclick="showToast('Editing attendance for Feb 24...')">Edit</button></td>
-                        </tr>
-                        <tr>
-                            <td>Feb 24, 2026</td>
-                            <td>DSA</td>
-                            <td><span class="badge badge-purple">CS-B</span></td>
-                            <td><span style="color:#16a34a; font-weight:600;">33</span></td>
-                            <td><span style="color:#dc2626; font-weight:600;">5</span></td>
-                            <td><button class="btn btn-sm btn-outline"
-                                    onclick="showToast('Editing attendance for Feb 24...')">Edit</button></td>
-                        </tr>
-                        <tr>
-                            <td>Feb 23, 2026</td>
-                            <td>OOP</td>
-                            <td><span class="badge badge-yellow">IT-A</span></td>
-                            <td><span style="color:#16a34a; font-weight:600;">30</span></td>
-                            <td><span style="color:#dc2626; font-weight:600;">6</span></td>
-                            <td><button class="btn btn-sm btn-outline"
-                                    onclick="showToast('Editing attendance for Feb 23...')">Edit</button></td>
-                        </tr>
-                    </tbody>
-                </table>
+                {% endif %}
             </div>
         </div>
-
         <!-- =============== SECTION: My Classes =============== -->
         <div id="section-myClasses" class="page-section">
             <div class="stats-grid">
@@ -1192,147 +1200,20 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        // ============ Edit Attendance ============
-        let allStudents = [];
-        let attendanceState = {}; // { "student_id": { name: "...", status: 'P' } }
-
-        // Fetch students on page load
+        // Auto-switch to Edit Attendance section if records were loaded
         window.addEventListener('DOMContentLoaded', () => {
-            fetch('/api/students')
-                .then(res => res.json())
-                .then(data => {
-                    if (data.students) {
-                        allStudents = data.students;
-                    }
-                })
-                .catch(err => console.error("Error fetching students:", err));
+            {% if filter %}
+            const editNavItem = document.querySelector('[onclick="showSection(\'editAttendance\', this)"]');
+            if (editNavItem) showSection('editAttendance', editNavItem);
+            {% endif %}
         });
 
-        function loadAttendanceStudents() {
-            const subjectKey = document.getElementById('attSubject').value;
-            const dateVal = document.getElementById('attDate').value;
-            if (!subjectKey) { showToast('Please select a subject first'); return; }
-            if (!dateVal) { showToast('Please select a date first'); return; }
-
-            const grid = document.getElementById('attendanceGrid');
-            const editor = document.getElementById('attendanceEditor');
-            editor.style.display = 'block';
-
-            // Clear grid (keep headers)
-            grid.innerHTML = `
-                <div class="att-header" style="justify-content:center;">#</div>
-                <div class="att-header">Student Name</div>
-                <div class="att-header">Status</div>
-            `;
-
-            attendanceState = {};
-
-            if (allStudents.length === 0) {
-                grid.innerHTML += `<div class="att-cell" style="grid-column: span 3; justify-content:center; color:#888;">No students found in the database.</div>`;
-                updateAttendanceSummary();
-                return;
+        // Toggle inline edit row open/close
+        function toggleEditRow(recordId) {
+            const editDiv = document.getElementById('edit-' + recordId);
+            if (editDiv) {
+                editDiv.style.display = editDiv.style.display === 'none' ? 'flex' : 'none';
             }
-
-            allStudents.forEach((student, i) => {
-                attendanceState[student.id] = { name: student.name, status: 'P' }; // Default: Present
-
-                grid.innerHTML += `
-                    <div class="att-cell number">${i + 1}</div>
-                    <div class="att-cell">${student.name} <span style="color:#888; font-size: 12px; margin-left: 8px;">(Roll: ${student.roll_no || student.id})</span></div>
-                    <div class="att-cell">
-                        <div class="att-toggle">
-                            <button class="att-btn p selected" id="p-${student.id}" onclick="toggleAtt('${student.id}', 'P')">P</button>
-                            <button class="att-btn a" id="a-${student.id}" onclick="toggleAtt('${student.id}', 'A')">A</button>
-                        </div>
-                    </div>
-                `;
-            });
-
-            updateAttendanceSummary();
-        }
-
-        function toggleAtt(studentId, status) {
-            if (attendanceState[studentId]) {
-                attendanceState[studentId].status = status;
-            }
-
-            const pBtn = document.getElementById('p-' + studentId);
-            const aBtn = document.getElementById('a-' + studentId);
-
-            pBtn.classList.toggle('selected', status === 'P');
-            aBtn.classList.toggle('selected', status === 'A');
-
-            updateAttendanceSummary();
-        }
-
-        function markAll(status) {
-            Object.keys(attendanceState).forEach(studentId => {
-                attendanceState[studentId].status = status;
-                document.getElementById('p-' + studentId).classList.toggle('selected', status === 'P');
-                document.getElementById('a-' + studentId).classList.toggle('selected', status === 'A');
-            });
-            updateAttendanceSummary();
-        }
-
-        function updateAttendanceSummary() {
-            const total = Object.keys(attendanceState).length;
-            const present = Object.values(attendanceState).filter(s => s.status === 'P').length;
-            const absent = total - present;
-            const badgesDiv = document.getElementById('attendanceSummaryBadges');
-            badgesDiv.innerHTML = `
-                <div class="summary-chip total">Total: ${total}</div>
-                <div class="summary-chip present">Present: ${present}</div>
-                <div class="summary-chip absent">Absent: ${absent}</div>
-            `;
-        }
-
-        function saveAttendance() {
-            const subject = document.getElementById('attSubject').value;
-            const dateStr = document.getElementById('attDate').value;
-
-            if (!subject || !dateStr) {
-                showToast("Subject and Date are required to save.");
-                return;
-            }
-
-            const records = Object.keys(attendanceState).map(studentId => {
-                return {
-                    student_id: studentId,
-                    student_name: attendanceState[studentId].name,
-                    status: attendanceState[studentId].status
-                };
-            });
-
-            fetch('/api/attendance', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    subject: subject,
-                    date: dateStr,
-                    records: records
-                })
-            })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        const total = records.length;
-                        const present = records.filter(s => s.status === 'P').length;
-                        showToast(`✅ Attendance saved! ${present}/${total} present.`);
-                    } else {
-                        showToast(`❌ Error: ${data.error}`);
-                    }
-                })
-                .catch(err => {
-                    console.error("Save error:", err);
-                    showToast("❌ Failed to save attendance.");
-                });
-        }
-
-        function resetAttendance() {
-            markAll('P');
-            showToast('↩ Attendance reset to all present.');
         }
 
         // ============ Schedule ============

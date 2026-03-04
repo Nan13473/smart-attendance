@@ -782,293 +782,302 @@
             <div class="stats-grid">
                 <div class="stat-card">
                     <h3>Overall Attendance</h3>
-                    <div class="value" id="overallAttText">--%</div>
+                    <div class="value" id="overallAttText">{% if percent_count is defined %}{{ percent_count }}%{% else
+                        %}--%{% endif %}</div>
                     <div class="progress-bar-container">
-                        <div class="progress-bar" id="overallAttBar" style="width: 0%;"></div>
-                    </div>
-                    <div class="sub-text" id="overallAttStatus">Status: Loading...</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Classes Attended</h3>
-                    <div class="value" id="classesAttendedText">-- <span style="font-size: 20px; color: #888;">/
-                            --</span></div>
-                    <div class="sub-text">Total lectures this semester</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Classes Missed</h3>
-                    <div class="value" id="classesMissedText" style="color: #dc2626;">--</div>
-                    <div class="sub-text">Leaves taken or absent</div>
-                </div>
-
-                <div class="stat-card">
-                    <h3>Current CGPA</h3>
-                    <div class="value">8.42</div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: 84.2%;"></div>
-                    </div>
-                    <div class="sub-text">Out of 10.0</div>
-                </div>
-            </div>
-
-            <!-- Subject Selection -->
-            <div class="section-panel">
-                <h2>Detailed Subject Attendance</h2>
-                <div class="subject-selector">
-                    <select id="subjectDropdown">
-                        <option value="" disabled selected>Select a subject to view attendance...</option>
-                        <option value="math">Advanced Mathematics</option>
-                        <option value="cs">Data Structures & Algorithms</option>
-                        <option value="physics">Applied Physics</option>
-                        <option value="db">Database Management Systems</option>
-                    </select>
-                    <button class="btn-primary" onclick="checkSubjectAttendance()">Check</button>
-                </div>
-
-                <div id="subjectResultBox" class="subject-result">
-                    <div class="result-title" id="resSubjectName">Subject Name</div>
-                    <div class="result-stats">
-                        <div class="result-item">
-                            <span class="label">Percentage</span>
-                            <span class="val" id="resPercentage">0%</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="label">Attended</span>
-                            <span class="val" id="resAttended">0 / 0</span>
-                        </div>
-                        <div class="result-item">
-                            <span class="label">Status</span>
-                            <span class="val" id="resStatus" style="color: #0066ff;">-</span>
+                        <div class="progress-bar" id="overallAttBar"
+                            style="width: {% if percent_count is defined %}{{ percent_count }}%{% else %}0%{% endif %};">
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div id="section-monthly" class="page-section">
-            <div class="section-panel">
-                <h2>Monthly Attendance Calendar</h2>
-                <div class="month-selector">
-                    <button class="month-btn" onclick="changeMonth(-1)">◀ Prev</button>
-                    <span class="month-label" id="monthLabel">February 2026</span>
-                    <button class="month-btn" onclick="changeMonth(1)">Next ▶</button>
-                </div>
-                <div class="calendar-grid" id="calendarGrid">
-                    <!-- Calendar header -->
-                    <div class="calendar-header">Sun</div>
-                    <div class="calendar-header">Mon</div>
-                    <div class="calendar-header">Tue</div>
-                    <div class="calendar-header">Wed</div>
-                    <div class="calendar-header">Thu</div>
-                    <div class="calendar-header">Fri</div>
-                    <div class="calendar-header">Sat</div>
-                    <!-- Days are filled by JS -->
-                </div>
-                <div class="calendar-legend">
-                    <div class="legend-item">
-                        <div class="legend-dot present"></div> Present
+                    <div class="sub-text" id="overallAttStatus">
+                        {% if percent_count is defined %}
+                        {% if percent_count < 60 %}Status: Critical: Below 60% {% elif percent_count < 75 %}Status:
+                            Warning: Below 75% {% else %}Status: Good Standing{% endif %} {% else %}Status: Loading...{%
+                            endif %} </div>
                     </div>
-                    <div class="legend-item">
-                        <div class="legend-dot absent"></div> Absent
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot holiday"></div> Holiday / Sunday
-                    </div>
-                </div>
-                <div class="month-summary" id="monthSummary"></div>
-            </div>
-        </div>
 
-
-        <div id="section-schedule" class="page-section">
-            <div class="section-panel">
-                <h2>Weekly Class Schedule</h2>
-                <div class="day-tabs" id="dayTabs">
-                    <div class="day-tab active" onclick="showDay('Monday', this)">Monday</div>
-                    <div class="day-tab" onclick="showDay('Tuesday', this)">Tuesday</div>
-                    <div class="day-tab" onclick="showDay('Wednesday', this)">Wednesday</div>
-                    <div class="day-tab" onclick="showDay('Thursday', this)">Thursday</div>
-                    <div class="day-tab" onclick="showDay('Friday', this)">Friday</div>
-                    <div class="day-tab" onclick="showDay('Saturday', this)">Saturday</div>
-                </div>
-                <table class="schedule-table">
-                    <thead>
-                        <tr>
-                            <th>Time</th>
-                            <th>Subject</th>
-                            <th>Type</th>
-                            <th>Room</th>
-                            <th>Professor</th>
-                        </tr>
-                    </thead>
-                    <tbody id="scheduleBody"></tbody>
-                </table>
-            </div>
-        </div>
-
-
-        <div id="section-assignments" class="page-section">
-            <div class="section-panel">
-                <h2>Assignments & Submissions</h2>
-                <div class="assignment-list">
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>DSA: Binary Trees Problem Set</h4>
-                            <p>Due: Feb 28, 2026 &bull; Data Structures & Algorithms</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge pending">Pending</span>
-                        </div>
-                    </div>
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>Mathematics: Integration Worksheet</h4>
-                            <p>Due: Feb 25, 2026 &bull; Advanced Mathematics</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge submitted">Submitted</span>
-                        </div>
-                    </div>
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>Physics: Wave Optics Lab Report</h4>
-                            <p>Due: Feb 20, 2026 &bull; Applied Physics</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge graded">Graded: 85/100</span>
-                        </div>
-                    </div>
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>DBMS: ER Diagram Design</h4>
-                            <p>Due: Feb 18, 2026 &bull; Database Management Systems</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge overdue">Overdue</span>
-                        </div>
-                    </div>
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>DSA: Sorting Algorithms Analysis</h4>
-                            <p>Due: Feb 14, 2026 &bull; Data Structures & Algorithms</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge graded">Graded: 92/100</span>
-                        </div>
-                    </div>
-                    <div class="assignment-card">
-                        <div class="assignment-info">
-                            <h4>Mathematics: Fourier Series Assignment</h4>
-                            <p>Due: Feb 10, 2026 &bull; Advanced Mathematics</p>
-                        </div>
-                        <div class="assignment-meta">
-                            <span class="status-badge submitted">Submitted</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-
-        <div id="section-grades" class="page-section">
-            <div class="grades-overview">
-                <div class="gpa-card">
-                    <div class="gpa-value">8.42</div>
-                    <div class="gpa-label">Current CGPA</div>
-                </div>
-                <div class="grade-card">
-                    <div class="grade-value">8.75</div>
-                    <div class="grade-label">This Semester GPA</div>
-                </div>
-                <div class="grade-card">
-                    <div class="grade-value">4</div>
-                    <div class="grade-label">Subjects Enrolled</div>
-                </div>
-                <div class="grade-card">
-                    <div class="grade-value">20</div>
-                    <div class="grade-label">Credits This Sem</div>
-                </div>
-            </div>
-
-            <div class="section-panel">
-                <h2>Subject-wise Grades</h2>
-                <table class="grades-table">
-                    <thead>
-                        <tr>
-                            <th>Subject</th>
-                            <th>Credits</th>
-                            <th>Internal</th>
-                            <th>External</th>
-                            <th>Total</th>
-                            <th>Grade</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Advanced Mathematics</td>
-                            <td>5</td>
-                            <td>38 / 40</td>
-                            <td>52 / 60</td>
-                            <td>90</td>
-                            <td><span class="grade-letter a">A+</span></td>
-                        </tr>
-                        <tr>
-                            <td>Data Structures & Algorithms</td>
-                            <td>5</td>
-                            <td>35 / 40</td>
-                            <td>48 / 60</td>
-                            <td>83</td>
-                            <td><span class="grade-letter a">A</span></td>
-                        </tr>
-                        <tr>
-                            <td>Applied Physics</td>
-                            <td>4</td>
-                            <td>28 / 40</td>
-                            <td>39 / 60</td>
-                            <td>67</td>
-                            <td><span class="grade-letter b">B+</span></td>
-                        </tr>
-                        <tr>
-                            <td>Database Management Systems</td>
-                            <td>6</td>
-                            <td>36 / 40</td>
-                            <td>55 / 60</td>
-                            <td>91</td>
-                            <td><span class="grade-letter a">A+</span></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="section-panel">
-                <h2>Semester-wise CGPA Trend</h2>
-                <div class="stats-grid">
                     <div class="stat-card">
-                        <h3>Semester 1</h3>
-                        <div class="value">7.80</div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: 78%;"></div>
-                        </div>
+                        <h3>Classes Attended</h3>
+                        <div class="value" id="classesAttendedText">{% if present_count is defined %}{{ present_count
+                            }}{% else %}--{% endif %} <span style="font-size: 20px; color: #888;">/
+                                {% if total_count is defined %}{{ total_count }}{% else %}--{% endif %}</span></div>
+                        <div class="sub-text">Total lectures this semester</div>
                     </div>
+
                     <div class="stat-card">
-                        <h3>Semester 2</h3>
-                        <div class="value">8.10</div>
-                        <div class="progress-bar-container">
-                            <div class="progress-bar" style="width: 81%;"></div>
-                        </div>
+                        <h3>Classes Missed</h3>
+                        <div class="value" id="classesMissedText" style="color: #dc2626;">{% if absent_count is defined
+                            %}{{ absent_count }}{% else %}--{% endif %}</div>
+                        <div class="sub-text">Leaves taken or absent</div>
                     </div>
+
                     <div class="stat-card">
-                        <h3>Semester 3</h3>
+                        <h3>Current CGPA</h3>
                         <div class="value">8.42</div>
                         <div class="progress-bar-container">
                             <div class="progress-bar" style="width: 84.2%;"></div>
                         </div>
+                        <div class="sub-text">Out of 10.0</div>
+                    </div>
+                </div>
+
+                <!-- Subject Selection -->
+                <div class="section-panel">
+                    <h2>Detailed Subject Attendance</h2>
+                    <div class="subject-selector">
+                        <select id="subjectDropdown">
+                            <option value="" disabled selected>Select a subject to view attendance...</option>
+                            <option value="math">Advanced Mathematics</option>
+                            <option value="cs">Data Structures & Algorithms</option>
+                            <option value="physics">Applied Physics</option>
+                            <option value="db">Database Management Systems</option>
+                        </select>
+                        <button class="btn-primary" onclick="checkSubjectAttendance()">Check</button>
+                    </div>
+
+                    <div id="subjectResultBox" class="subject-result">
+                        <div class="result-title" id="resSubjectName">Subject Name</div>
+                        <div class="result-stats">
+                            <div class="result-item">
+                                <span class="label">Percentage</span>
+                                <span class="val" id="resPercentage">0%</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Attended</span>
+                                <span class="val" id="resAttended">0 / 0</span>
+                            </div>
+                            <div class="result-item">
+                                <span class="label">Status</span>
+                                <span class="val" id="resStatus" style="color: #0066ff;">-</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+
+
+            <div id="section-monthly" class="page-section">
+                <div class="section-panel">
+                    <h2>Monthly Attendance Calendar</h2>
+                    <div class="month-selector">
+                        <button class="month-btn" onclick="changeMonth(-1)">◀ Prev</button>
+                        <span class="month-label" id="monthLabel">February 2026</span>
+                        <button class="month-btn" onclick="changeMonth(1)">Next ▶</button>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid">
+                        <!-- Calendar header -->
+                        <div class="calendar-header">Sun</div>
+                        <div class="calendar-header">Mon</div>
+                        <div class="calendar-header">Tue</div>
+                        <div class="calendar-header">Wed</div>
+                        <div class="calendar-header">Thu</div>
+                        <div class="calendar-header">Fri</div>
+                        <div class="calendar-header">Sat</div>
+                        <!-- Days are filled by JS -->
+                    </div>
+                    <div class="calendar-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot present"></div> Present
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot absent"></div> Absent
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot holiday"></div> Holiday / Sunday
+                        </div>
+                    </div>
+                    <div class="month-summary" id="monthSummary"></div>
+                </div>
+            </div>
+
+
+            <div id="section-schedule" class="page-section">
+                <div class="section-panel">
+                    <h2>Weekly Class Schedule</h2>
+                    <div class="day-tabs" id="dayTabs">
+                        <div class="day-tab active" onclick="showDay('Monday', this)">Monday</div>
+                        <div class="day-tab" onclick="showDay('Tuesday', this)">Tuesday</div>
+                        <div class="day-tab" onclick="showDay('Wednesday', this)">Wednesday</div>
+                        <div class="day-tab" onclick="showDay('Thursday', this)">Thursday</div>
+                        <div class="day-tab" onclick="showDay('Friday', this)">Friday</div>
+                        <div class="day-tab" onclick="showDay('Saturday', this)">Saturday</div>
+                    </div>
+                    <table class="schedule-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Subject</th>
+                                <th>Type</th>
+                                <th>Room</th>
+                                <th>Professor</th>
+                            </tr>
+                        </thead>
+                        <tbody id="scheduleBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <div id="section-assignments" class="page-section">
+                <div class="section-panel">
+                    <h2>Assignments & Submissions</h2>
+                    <div class="assignment-list">
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>DSA: Binary Trees Problem Set</h4>
+                                <p>Due: Feb 28, 2026 &bull; Data Structures & Algorithms</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge pending">Pending</span>
+                            </div>
+                        </div>
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>Mathematics: Integration Worksheet</h4>
+                                <p>Due: Feb 25, 2026 &bull; Advanced Mathematics</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge submitted">Submitted</span>
+                            </div>
+                        </div>
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>Physics: Wave Optics Lab Report</h4>
+                                <p>Due: Feb 20, 2026 &bull; Applied Physics</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge graded">Graded: 85/100</span>
+                            </div>
+                        </div>
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>DBMS: ER Diagram Design</h4>
+                                <p>Due: Feb 18, 2026 &bull; Database Management Systems</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge overdue">Overdue</span>
+                            </div>
+                        </div>
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>DSA: Sorting Algorithms Analysis</h4>
+                                <p>Due: Feb 14, 2026 &bull; Data Structures & Algorithms</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge graded">Graded: 92/100</span>
+                            </div>
+                        </div>
+                        <div class="assignment-card">
+                            <div class="assignment-info">
+                                <h4>Mathematics: Fourier Series Assignment</h4>
+                                <p>Due: Feb 10, 2026 &bull; Advanced Mathematics</p>
+                            </div>
+                            <div class="assignment-meta">
+                                <span class="status-badge submitted">Submitted</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="section-grades" class="page-section">
+                <div class="grades-overview">
+                    <div class="gpa-card">
+                        <div class="gpa-value">8.42</div>
+                        <div class="gpa-label">Current CGPA</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-value">8.75</div>
+                        <div class="grade-label">This Semester GPA</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-value">4</div>
+                        <div class="grade-label">Subjects Enrolled</div>
+                    </div>
+                    <div class="grade-card">
+                        <div class="grade-value">20</div>
+                        <div class="grade-label">Credits This Sem</div>
+                    </div>
+                </div>
+
+                <div class="section-panel">
+                    <h2>Subject-wise Grades</h2>
+                    <table class="grades-table">
+                        <thead>
+                            <tr>
+                                <th>Subject</th>
+                                <th>Credits</th>
+                                <th>Internal</th>
+                                <th>External</th>
+                                <th>Total</th>
+                                <th>Grade</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Advanced Mathematics</td>
+                                <td>5</td>
+                                <td>38 / 40</td>
+                                <td>52 / 60</td>
+                                <td>90</td>
+                                <td><span class="grade-letter a">A+</span></td>
+                            </tr>
+                            <tr>
+                                <td>Data Structures & Algorithms</td>
+                                <td>5</td>
+                                <td>35 / 40</td>
+                                <td>48 / 60</td>
+                                <td>83</td>
+                                <td><span class="grade-letter a">A</span></td>
+                            </tr>
+                            <tr>
+                                <td>Applied Physics</td>
+                                <td>4</td>
+                                <td>28 / 40</td>
+                                <td>39 / 60</td>
+                                <td>67</td>
+                                <td><span class="grade-letter b">B+</span></td>
+                            </tr>
+                            <tr>
+                                <td>Database Management Systems</td>
+                                <td>6</td>
+                                <td>36 / 40</td>
+                                <td>55 / 60</td>
+                                <td>91</td>
+                                <td><span class="grade-letter a">A+</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section-panel">
+                    <h2>Semester-wise CGPA Trend</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Semester 1</h3>
+                            <div class="value">7.80</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 78%;"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Semester 2</h3>
+                            <div class="value">8.10</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 81%;"></div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Semester 3</h3>
+                            <div class="value">8.42</div>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" style="width: 84.2%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
     </main>
 
@@ -1099,6 +1108,8 @@
         }
 
 
+        // API Fetch has been replaced with server-side Jinja templates from app.py
+        /*
         window.addEventListener('DOMContentLoaded', () => {
             fetch('/api/my_attendance')
                 .then(res => res.json())
@@ -1121,6 +1132,7 @@
                 })
                 .catch(err => console.error("Error fetching my attendance:", err));
         });
+        */
 
 
         const subjectData = {
