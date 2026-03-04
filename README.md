@@ -118,3 +118,25 @@ python app.py
 * Student data blueprint is *student_data.py*
 ---
 
+---
+
+## 📋 Changelog
+
+### v1.1 — Student ID & Attendance Tracking (2026-03-05)
+
+#### 🆕 New Features
+- **Separated `Student ID` from `Roll Number`:** These are now two distinct fields. Roll No is the physical class roll number; Student ID is the unique login credential used by the student to access their portal.
+- **Admin Panel — Dual ID Entry:** The Admin form now has two separate input fields: `True Roll Number` (e.g. `54`) and `Login Student ID` (e.g. `S001`).
+- **Live Attendance Dashboard for Students:** The student portal (`/user/<id>`) now fetches and displays real attendance stats from the database — Total Classes, Present, Absent, and Attendance Percentage — using server-side Jinja2 rendering.
+- **Attendance linked by Student ID:** When a professor loads students for a session, their `student_id` is now stored alongside `roll_no` in the `Attendance` table, enabling the student portal to correctly look up records.
+
+#### 🐛 Bug Fixes
+- **`db.string` → `db.String`:** Fixed a fatal `AttributeError` crash during startup caused by a lowercase `s` in SQLAlchemy column definitions in `attendance.py` and `studentdata.py`.
+- **Variable overwrite crash in `/user` route:** Fixed a bug where the URL `id` parameter was being overwritten by a database object, causing subsequent `count()` queries to receive an object instead of a string, crashing the route.
+- **`AttributeError: NoneType`:** Fixed crash when a student logs in but has no attendance record yet — the route now fails gracefully and redirects with a message.
+- **Division by Zero:** Fixed `ZeroDivisionError` in attendance percentage calculation for students with zero recorded classes.
+- **Jinja `TypeError` — list vs int:** Fixed `percent_count` being stored as a list `[(val)*100]` or tuple `((val), 1)` instead of a plain number, causing Jinja2 comparisons like `{% if percent_count < 75 %}` to crash.
+- **`Methods` → `methods` casing:** Fixed Flask route decorator using incorrect `Methods` (uppercase) argument which caused the route registration to silently fail.
+- **Removed dead JS `fetch('/api/my_attendance')`:** The frontend was overwriting server-rendered Jinja data with a broken JavaScript API call. The JS fetch has been disabled and replaced with proper Jinja2 template variables.
+- **Fixed `redirect()` incorrect kwargs:** `redirect('/', message=...)` is invalid Flask syntax; corrected to pass message via URL query string `/?message=...`.
+
